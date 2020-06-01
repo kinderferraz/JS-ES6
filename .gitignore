@@ -1,0 +1,7 @@
+node_modules/
+
+
+# emacs support files
+*~
+.dir-locals.el
+\#*#

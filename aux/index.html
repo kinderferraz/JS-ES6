@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta content="">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>js-ex</title>
+	</head>
+	<body>
+		<div id="app">
+			<button onclick="criarQuadrado()">
+				Add Quadrado
+			</button>
+			<button onclick="removerQuadrado()">
+				Remove Quadrado
+			</button>
+			<div id="list">
+				<input type="text" name="nome">
+				<button onClick="add()">
+					add nome
+				</button>
+				<button onclick="removeNome()">
+					Remove nome
+				</button>
+			</div>
+
+			<div id="repo-list">
+				<input type="text" placeholder="usuario">
+				<button onclick="fetchRepos()">
+					Fetch
+				</button>
+
+			</div>
+			
+		</div>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>	
+		<script type="text/javascript">
+			var qId = 0;
+
+			function criarQuadrado(){
+				var appEl = document.getElementById('app');
+				var quadrado = document.createElement('div');
+				quadrado.id = qId;
+				quadrado.className = 'quadrado';
+				quadrado.style.margin = '10px';
+				quadrado.style.height = '100px';
+				quadrado.style.width = '100px';
+				quadrado.style.backgroundColor = '#F00';
+				quadrado.setAttribute('onmouseover', 'mudarCor('+qId+')'); 
+				quadrado.setAttribute('onmouseleave', 'restaurarCor('+qId+')');
+				qId++;
+				appEl.appendChild(quadrado);
+			}
+
+			function mudarCor (pos) {
+				var q = document.getElementById(pos);
+				q.style.backgroundColor = getRandomColor();
+			}
+
+			function restaurarCor(pos){
+				var q = document.getElementById(pos);
+				q.style.backgroundColor = '#F00';
+			}
+				
+			function removerQuadrado(){
+				var quadrado = document.querySelector('.quadrado');
+				if (!quadrado)
+					return;
+				quadrado.removeEventListener("mouseover", function mC (event){});
+				quadrado.removeEventListener("mouseleave", function mC (event){});
+				quadrado.parentElement.removeChild(quadrado);
+				
+			}
+
+			function getRandomColor() {
+				var letters = "0123456789ABCDEF";
+				var color = "#";
+				for (var i = 0; i < 6; i++) {
+					color += letters[Math.floor(Math.random() * 16)];
+				}
+				return color;
+			}
+
+
+			var nomes = ["kinder", "thom", "zoana"];
+
+			function listar(nomes) {
+				var list = document.createElement('ul');
+				nomes.forEach(nome => {
+					var li = document.createElement('li');
+					li.innerText = nome;
+					list.appendChild(li);
+				});
+				var app = document.getElementById('list');
+				app.appendChild(list);
+			}
+
+			listar(nomes);
+
+			function add() {
+				var inp = document.querySelector('input');
+				var oldList = document.querySelector('ul');
+				oldList.parentElement.removeChild(oldList);
+				var text = inp.value;
+				nomes.push(text);
+				listar(nomes);
+			}
+
+			function removeNome(){
+				var nome = document.querySelector('input').value;
+				var index = nomes.indexOf(nome)
+				var oldList = document.querySelector('ul');
+				oldList.parentElement.removeChild(oldList);
+				if(index > -1)
+					nomes.splice(index, 1);
+				listar(nomes);
+			}
+
+			function checaIdade(idade){
+				return new Promise((resolve, reject) =>{
+					setTimeout(null, 10000);
+					(idade > 18) ? resolve() : reject();
+				});
+			}
+
+			// checaIdade(2).then(
+			// 	()=>{
+			// 		console.log("Maior que 18");
+			// 	}).catch(()=>{
+			// 		console.log("ixi");
+			// }) 
+
+			function carregandoMsg(){
+				var listEl = document.querySelector('#repo-list ul');
+				listEl.innerHtml = 'Carregando';
+			}
+			
+			function produceList(repos){
+				var car = document.getElementById('carregando')
+				if (car != undefined)
+					car.parentElement.removeChild(car);
+				var oldList = document.querySelector('#repo-list ul');
+				if (oldList)
+					oldList.parentElement.removeChild(oldList);
+				var listEl = document.createElement('ul');
+				repos.forEach((repo) => {
+					var liEl = document.createElement('li');
+					var textEl = document.createTextNode(repo);
+					liEl.appendChild(textEl);
+					listEl.appendChild(liEl);
+				});
+				document.querySelector('#repo-list').appendChild(listEl);
+			}
+			
+			function fetchRepos(){
+				var inputEl = document.querySelector('#repo-list input');
+				var user = inputEl.value;
+				inputEl.value = '';
+				user = user || 'diego3g';
+
+				displayCarregando(inputEl.parentElement);
+				
+				axios.get(`https://api.github.com/users/${user}/repos`)
+					.then((response) => {
+						var repoNames = [];
+						response.data.forEach((repo) => {
+							repoNames.push(repo.name);
+						});
+						produceList(repoNames);
+					})
+					.catch((error) => {
+						var car = document.getElementById('carregando')
+						if (car != undefined)
+							car.parentElement.removeChild(car);
+						console.log('ixi, deu erro', error);
+					});
+			}
+
+			function displayCarregando(divList){
+				var car = document.createElement('span');
+				car.id = "carregando";
+				var text = document.createTextNode('Carregando...');
+				car.appendChild(text)
+				divList.appendChild(car);
+			}
+			
+		</script>
+		
+	</body>
+</html>
