@@ -1,0 +1,6 @@
+* ES6 com API do GitHub
+
+Exerício para praticar JavaScript (ES6), usando a API do GitHub como
+fonte de dados. O exercício foi proposto no curso starter da
+RocketSeat, e foi feito com algumas alterações pois a API mudou desde
+então.
