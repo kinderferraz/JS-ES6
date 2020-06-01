@@ -24,22 +24,28 @@ class App {
     
     if (userInput === 0)
       return;
-
-    const response = await api.get(`/repos/${userInput}/${repoInput}`);
-    console.log(response);
     
-    const {name, description, html_url, owner: {avatar_url}} = response.data;
+    try {
+      const response = await api.get(`/repos/${userInput}/${repoInput}`);
+      console.log(response);
+    
+      const {name, description, html_url, owner: {avatar_url}} = response.data;
 
-    this.repositories.push({
-      name,
-      description,
-      html_url,
-      avatar_url,
-    });
+      this.repositories.push({
+        name,
+        description,
+        html_url,
+        avatar_url,
+      });
+
+      this.render();
+    } catch (err) {
+      alert(`${userInput} não possui o repositório ${repoInput}.`);
+    }
 
     this.inputUserEl.value = "";
     this.inputRepoEl.value = "";
-    this.render();
+
   }
 
   render(){
